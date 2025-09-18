@@ -20,5 +20,3 @@
 - 🧭 **Clean UI** — Figma-designed Android screens focused on readability
 - 🔄 **GitLab CI/CD** — automated testing + build + deploy
 - 📈 **Analytics-ready** — hooks for events & engagement tracking
-
-## Architecture (High Level)
