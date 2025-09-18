@@ -1,0 +1,179 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TicketController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">onetomany.ticket</a>
+</div>
+
+<h1>Coverage Summary for Class: TicketController (onetomany.ticket)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TicketController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.1%
+  </span>
+  <span class="absValue">
+    (4/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.7%
+  </span>
+  <span class="absValue">
+    (14/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package onetomany.ticket;
+&nbsp;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.http.*;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Date;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/tickets&quot;)
+<b class="fc">&nbsp;public class TicketController {</b>
+&nbsp;    @Autowired
+&nbsp;    private TicketRepository ticketRepo;
+&nbsp;
+&nbsp;    @PostMapping
+&nbsp;    public ResponseEntity&lt;Ticket&gt; create(@RequestBody Ticket t) {
+<b class="fc">&nbsp;        t.setResolved(false);</b>
+<b class="fc">&nbsp;        t.setCreatedAt(new Date());</b>
+<b class="fc">&nbsp;        return new ResponseEntity&lt;&gt;(ticketRepo.save(t), HttpStatus.CREATED);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping
+&nbsp;    public List&lt;Ticket&gt; list() {
+<b class="nc">&nbsp;        return ticketRepo.findAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;Ticket&gt; get(@PathVariable Long id) {
+<b class="fc">&nbsp;        Optional&lt;Ticket&gt; o = ticketRepo.findById(id);</b>
+<b class="fc">&nbsp;        return o.map(r -&gt; new ResponseEntity&lt;&gt;(r, HttpStatus.OK))</b>
+<b class="fc">&nbsp;                .orElse(new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/{id}/resolve&quot;)
+&nbsp;    public ResponseEntity&lt;Ticket&gt; resolve(
+&nbsp;            @PathVariable Long id,
+&nbsp;            @RequestParam Long adminId) {
+<b class="fc">&nbsp;        Optional&lt;Ticket&gt; o = ticketRepo.findById(id);</b>
+<b class="pc">&nbsp;        if (!o.isPresent()) {</b>
+<b class="nc">&nbsp;            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        Ticket t = o.get();</b>
+<b class="pc">&nbsp;        if (!t.getAdmin().getId().equals(adminId)) {</b>
+<b class="nc">&nbsp;            return new ResponseEntity&lt;&gt;(HttpStatus.FORBIDDEN);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        t.setResolved(true);</b>
+<b class="fc">&nbsp;        t.setResolvedAt(new Date());</b>
+<b class="fc">&nbsp;        return new ResponseEntity&lt;&gt;(ticketRepo.save(t), HttpStatus.OK);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/reporter/{reporterId}&quot;)
+&nbsp;    public List&lt;Ticket&gt; byReporter(@PathVariable Long reporterId) {
+<b class="nc">&nbsp;        return ticketRepo.findByReporter_Id(reporterId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/admin/{adminId}&quot;)
+&nbsp;    public List&lt;Ticket&gt; byAdmin(@PathVariable Long adminId) {
+<b class="nc">&nbsp;        return ticketRepo.findByAdmin_Id(adminId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-06 12:37</div>
+</div>
+</body>
+</html>

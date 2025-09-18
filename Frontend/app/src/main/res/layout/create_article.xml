@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="📰 Create Article"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#3F51B5"
+            android:layout_marginBottom="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:id="@+id/etTitle"
+            android:hint="Article Title"
+            android:background="@drawable/rounded_white"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:id="@+id/etContent"
+            android:hint="Content"
+            android:inputType="textMultiLine"
+            android:minLines="6"
+            android:background="@drawable/rounded_white"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:id="@+id/etPublication"
+            android:hint="Publication"
+            android:background="@drawable/rounded_white"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:id="@+id/etDate"
+            android:hint="Enter Date (YYYY-MM-DD)"
+            android:background="@drawable/rounded_white"
+            android:padding="16dp"
+            android:layout_marginBottom="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/btnSubmit"
+            android:text="Submit Article"
+            android:backgroundTint="#6200EE"
+            android:textColor="#FFFFFF"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <!-- success message for test -->
+        <TextView
+            android:id="@+id/tvSuccess"
+            android:text=""
+            android:textColor="@android:color/holo_green_dark"
+            android:textSize="16sp"
+            android:visibility="gone"
+            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</ScrollView>

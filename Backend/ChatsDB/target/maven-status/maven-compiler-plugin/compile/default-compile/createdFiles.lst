@@ -1,0 +1,4 @@
+onetoone\Chats\Chat.class
+onetoone\Chats\ChatRepository.class
+onetoone\Main.class
+onetoone\Chats\ChatController.class

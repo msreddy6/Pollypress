@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+
+    <ImageView
+        android:id="@+id/pollImage"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scaleType="centerCrop"
+        android:src="@drawable/poll" />
+
+    <TextView
+        android:id="@+id/verifiedLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Verified Poll"
+        android:background="#FFFF00"
+        android:textColor="#FF0000"
+        android:textStyle="bold"
+        android:padding="6dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="12dp" />
+
+    <TextView
+        android:id="@+id/tvNewsPollTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Poll Title"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:padding="12dp" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupOptions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:orientation="vertical" />
+
+    <Button
+        android:id="@+id/btnVote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Vote"
+        android:layout_gravity="center"
+        android:layout_marginBottom="8dp" />
+
+    <!-- New: live‐stats text -->
+    <TextView
+        android:id="@+id/tvVoteStats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Your share: –   Total votes: –"
+        android:textSize="14sp"
+        android:padding="12dp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvPollMeta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="By Pollypress · Date"
+        android:textSize="14sp"
+        android:textColor="#888888"
+        android:padding="12dp"
+        android:gravity="end" />
+
+</LinearLayout>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Title Field -->
+        <EditText
+            android:id="@+id/etEditTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Title" />
+
+        <!-- Content Field -->
+        <EditText
+            android:id="@+id/etEditContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Content"
+            android:inputType="textMultiLine"
+            android:minLines="5" />
+
+        <!-- Author Field -->
+        <EditText
+            android:id="@+id/etEditAuthor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Author" />
+
+        <!-- Publication Field -->
+        <EditText
+            android:id="@+id/etEditPublication"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Publication" />
+
+        <!-- Publication Date Field -->
+        <EditText
+            android:id="@+id/etEditDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Publication Date (yyyy-MM-dd)"
+            android:inputType="date" />
+
+        <!-- Update Button -->
+        <Button
+            android:id="@+id/btnUpdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Update"
+            android:layout_marginTop="16dp" />
+
+        <!-- Delete Button -->
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+</ScrollView>

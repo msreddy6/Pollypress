@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EditPollActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.pollypress.content</a> &gt; <span class="el_source">EditPollActivity.java</span></div><h1>EditPollActivity.java</h1><pre class="source lang-java linenums">package com.example.pollypress.content;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.example.pollypress.R;
+import com.example.pollypress.VolleySingleton;
+
+import org.json.JSONObject;
+import org.json.JSONException;
+import org.json.JSONArray;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+<span class="fc" id="L22">public class EditPollActivity extends AppCompatActivity {</span>
+    private static final String BASE_URL = &quot;http://coms-3090-003.class.las.iastate.edu:8080/&quot;;
+    private static final String TAG = &quot;EditPollActivity&quot;;
+    private EditText etTitle, etDescription, etOptions;
+    private Button btnUpdate, btnDelete;
+    private long pollId; // Changed to long
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="fc" id="L31">        super.onCreate(savedInstanceState);</span>
+<span class="fc" id="L32">        setContentView(R.layout.activity_edit_poll);</span>
+
+<span class="fc" id="L34">        etTitle = findViewById(R.id.etEditPollTitle);</span>
+<span class="fc" id="L35">        etDescription = findViewById(R.id.etEditPollDescription);</span>
+<span class="fc" id="L36">        etOptions = findViewById(R.id.etEditPollOptions);</span>
+<span class="fc" id="L37">        btnUpdate = findViewById(R.id.btnUpdatePoll);</span>
+<span class="fc" id="L38">        btnDelete = findViewById(R.id.btnDeletePoll);</span>
+
+        // Retrieve pollId as a long extra
+<span class="fc" id="L41">        pollId = getIntent().getLongExtra(&quot;pollId&quot;, -1);</span>
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">        if (pollId == -1) {</span>
+<span class="nc" id="L43">            Toast.makeText(this, &quot;Invalid poll ID&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L44">            finish();</span>
+<span class="nc" id="L45">            return;</span>
+        }
+<span class="fc" id="L47">        String title = getIntent().getStringExtra(&quot;title&quot;);</span>
+<span class="fc" id="L48">        String description = getIntent().getStringExtra(&quot;description&quot;);</span>
+<span class="fc" id="L49">        String optionsStr = getIntent().getStringExtra(&quot;options&quot;);</span>
+
+<span class="fc" id="L51">        etTitle.setText(title);</span>
+<span class="fc" id="L52">        etDescription.setText(description);</span>
+<span class="fc" id="L53">        String cleanedOptions = optionsStr.replaceAll(&quot;[\\[\\]]&quot;, &quot;&quot;);</span>
+<span class="fc" id="L54">        etOptions.setText(cleanedOptions);</span>
+
+<span class="pc" id="L56">        btnUpdate.setOnClickListener(v -&gt; updatePoll());</span>
+<span class="pc" id="L57">        btnDelete.setOnClickListener(v -&gt; deletePoll());</span>
+<span class="fc" id="L58">    }</span>
+
+    private void updatePoll() {
+<span class="nc" id="L61">        String updatedTitle = etTitle.getText().toString().trim();</span>
+<span class="nc" id="L62">        String updatedDescription = etDescription.getText().toString().trim();</span>
+<span class="nc" id="L63">        String updatedOptionsStr = etOptions.getText().toString().trim();</span>
+
+<span class="nc bnc" id="L65" title="All 6 branches missed.">        if (updatedTitle.isEmpty() || updatedDescription.isEmpty() || updatedOptionsStr.isEmpty()){</span>
+<span class="nc" id="L66">            Toast.makeText(EditPollActivity.this, &quot;Please fill all fields&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L67">            return;</span>
+        }
+<span class="nc" id="L69">        List&lt;String&gt; options = new ArrayList&lt;&gt;(Arrays.asList(updatedOptionsStr.split(&quot;,&quot;)));</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">        for (int i = 0; i &lt; options.size(); i++){</span>
+<span class="nc" id="L71">            options.set(i, options.get(i).trim());</span>
+        }
+
+<span class="nc" id="L74">        String url = BASE_URL + &quot;polls/&quot; + pollId;</span>
+<span class="nc" id="L75">        JSONObject jsonBody = new JSONObject();</span>
+        try {
+<span class="nc" id="L77">            jsonBody.put(&quot;title&quot;, updatedTitle);</span>
+<span class="nc" id="L78">            jsonBody.put(&quot;description&quot;, updatedDescription);</span>
+<span class="nc" id="L79">            jsonBody.put(&quot;options&quot;, new JSONArray(options));</span>
+<span class="nc" id="L80">        } catch(JSONException e) {</span>
+<span class="nc" id="L81">            e.printStackTrace();</span>
+<span class="nc" id="L82">            Toast.makeText(EditPollActivity.this, &quot;JSON Error: &quot; + e.getMessage(), Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L83">            return;</span>
+<span class="nc" id="L84">        }</span>
+
+<span class="nc" id="L86">        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, url, jsonBody,</span>
+                response -&gt; {
+<span class="nc" id="L88">                    Toast.makeText(EditPollActivity.this, &quot;Poll updated successfully&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L89">                    finish();</span>
+<span class="nc" id="L90">                },</span>
+                error -&gt; {
+<span class="nc" id="L92">                    String errMsg = &quot;Failed to update poll&quot;;</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">                    if (error.networkResponse != null) {</span>
+<span class="nc" id="L94">                        errMsg += &quot; (HTTP &quot; + error.networkResponse.statusCode + &quot;): &quot; +</span>
+                                new String(error.networkResponse.data);
+                    } else {
+<span class="nc" id="L97">                        errMsg += &quot; &quot; + error.getMessage();</span>
+                    }
+<span class="nc" id="L99">                    Log.e(TAG, errMsg);</span>
+<span class="nc" id="L100">                    Toast.makeText(EditPollActivity.this, errMsg, Toast.LENGTH_LONG).show();</span>
+<span class="nc" id="L101">                });</span>
+<span class="nc" id="L102">        VolleySingleton.getInstance(this).addToRequestQueue(request);</span>
+<span class="nc" id="L103">    }</span>
+
+    private void deletePoll() {
+<span class="nc" id="L106">        String url = BASE_URL + &quot;polls/&quot; + pollId;</span>
+<span class="nc" id="L107">        StringRequest request = new StringRequest(Request.Method.DELETE, url,</span>
+                response -&gt; {
+<span class="nc" id="L109">                    Toast.makeText(EditPollActivity.this, &quot;Poll deleted successfully&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L110">                    finish();</span>
+<span class="nc" id="L111">                },</span>
+                error -&gt; {
+<span class="nc" id="L113">                    String errMsg = &quot;Failed to delete poll&quot;;</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">                    if (error.networkResponse != null) {</span>
+<span class="nc" id="L115">                        errMsg += &quot; (HTTP &quot; + error.networkResponse.statusCode + &quot;): &quot; +</span>
+                                new String(error.networkResponse.data);
+                    } else {
+<span class="nc" id="L118">                        errMsg += &quot; &quot; + error.getMessage();</span>
+                    }
+<span class="nc" id="L120">                    Log.e(TAG, errMsg);</span>
+<span class="nc" id="L121">                    Toast.makeText(EditPollActivity.this, errMsg, Toast.LENGTH_LONG).show();</span>
+<span class="nc" id="L122">                });</span>
+<span class="nc" id="L123">        VolleySingleton.getInstance(this).addToRequestQueue(request);</span>
+<span class="nc" id="L124">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span>Generated by the Android Gradle plugin 8.7.3</div></body></html>

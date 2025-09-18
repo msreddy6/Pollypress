@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EditArticleActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.pollypress.content</a> &gt; <span class="el_source">EditArticleActivity.java</span></div><h1>EditArticleActivity.java</h1><pre class="source lang-java linenums">package com.example.pollypress.content;
+
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.example.pollypress.R;
+import com.example.pollypress.VolleySingleton;
+
+import org.json.JSONObject;
+import org.json.JSONException;
+
+<span class="fc" id="L17">public class EditArticleActivity extends AppCompatActivity {</span>
+    private static final String BASE_URL = &quot;http://coms-3090-003.class.las.iastate.edu:8080/&quot;;
+    private EditText etTitle, etContent, etAuthor, etPublication, etDate;
+    private Button btnUpdate, btnDelete;
+    private int articleId;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="fc" id="L25">        super.onCreate(savedInstanceState);</span>
+<span class="fc" id="L26">        setContentView(R.layout.activity_edit_article);</span>
+
+<span class="fc" id="L28">        etTitle = findViewById(R.id.etEditTitle);</span>
+<span class="fc" id="L29">        etContent = findViewById(R.id.etEditContent);</span>
+<span class="fc" id="L30">        etAuthor = findViewById(R.id.etEditAuthor);</span>
+<span class="fc" id="L31">        etPublication = findViewById(R.id.etEditPublication);</span>
+<span class="fc" id="L32">        etDate = findViewById(R.id.etEditDate);</span>
+<span class="fc" id="L33">        btnUpdate = findViewById(R.id.btnUpdate);</span>
+<span class="fc" id="L34">        btnDelete = findViewById(R.id.btnDelete);</span>
+
+        // Retrieve passed article details from intent extras
+<span class="fc" id="L37">        articleId = getIntent().getIntExtra(&quot;articleId&quot;, -1);</span>
+<span class="fc" id="L38">        String title = getIntent().getStringExtra(&quot;title&quot;);</span>
+<span class="fc" id="L39">        String content = getIntent().getStringExtra(&quot;content&quot;);</span>
+<span class="fc" id="L40">        String author = getIntent().getStringExtra(&quot;author&quot;);</span>
+<span class="fc" id="L41">        String publication = getIntent().getStringExtra(&quot;publication&quot;);</span>
+<span class="fc" id="L42">        String publicationDate = getIntent().getStringExtra(&quot;publicationDate&quot;);</span>
+
+<span class="fc" id="L44">        etTitle.setText(title);</span>
+<span class="fc" id="L45">        etContent.setText(content);</span>
+<span class="fc" id="L46">        etAuthor.setText(author);</span>
+<span class="fc" id="L47">        etPublication.setText(publication);</span>
+<span class="fc" id="L48">        etDate.setText(publicationDate);</span>
+
+<span class="pc" id="L50">        btnUpdate.setOnClickListener(v -&gt; updateArticle());</span>
+<span class="pc" id="L51">        btnDelete.setOnClickListener(v -&gt; deleteArticle());</span>
+<span class="fc" id="L52">    }</span>
+
+    private void updateArticle() {
+<span class="nc" id="L55">        String updatedTitle = etTitle.getText().toString().trim();</span>
+<span class="nc" id="L56">        String updatedContent = etContent.getText().toString().trim();</span>
+<span class="nc" id="L57">        String updatedAuthor = etAuthor.getText().toString().trim();</span>
+<span class="nc" id="L58">        String updatedPublication = etPublication.getText().toString().trim();</span>
+<span class="nc" id="L59">        String updatedDate = etDate.getText().toString().trim();</span>
+
+<span class="nc bnc" id="L61" title="All 6 branches missed.">        if (updatedTitle.isEmpty() || updatedContent.isEmpty() || updatedAuthor.isEmpty() ||</span>
+<span class="nc bnc" id="L62" title="All 4 branches missed.">                updatedPublication.isEmpty() || updatedDate.isEmpty()) {</span>
+<span class="nc" id="L63">            Toast.makeText(EditArticleActivity.this, &quot;Please fill all fields&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L64">            return;</span>
+        }
+
+<span class="nc" id="L67">        String url = BASE_URL + &quot;articles/&quot; + articleId;</span>
+<span class="nc" id="L68">        JSONObject jsonBody = new JSONObject();</span>
+        try {
+<span class="nc" id="L70">            jsonBody.put(&quot;title&quot;, updatedTitle);</span>
+<span class="nc" id="L71">            jsonBody.put(&quot;content&quot;, updatedContent);</span>
+<span class="nc" id="L72">            jsonBody.put(&quot;author&quot;, updatedAuthor);</span>
+<span class="nc" id="L73">            jsonBody.put(&quot;publication&quot;, updatedPublication);</span>
+<span class="nc" id="L74">            jsonBody.put(&quot;publicationDate&quot;, updatedDate);</span>
+<span class="nc" id="L75">        } catch (JSONException e) {</span>
+<span class="nc" id="L76">            e.printStackTrace();</span>
+<span class="nc" id="L77">        }</span>
+
+<span class="nc" id="L79">        JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, url, jsonBody,</span>
+                response -&gt; {
+<span class="nc" id="L81">                    Toast.makeText(EditArticleActivity.this, &quot;Article updated successfully&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L82">                    finish();</span>
+<span class="nc" id="L83">                },</span>
+<span class="nc" id="L84">                error -&gt; Toast.makeText(EditArticleActivity.this, &quot;Failed to update article&quot;, Toast.LENGTH_SHORT).show());</span>
+
+<span class="nc" id="L86">        VolleySingleton.getInstance(this).addToRequestQueue(request);</span>
+<span class="nc" id="L87">    }</span>
+
+    private void deleteArticle() {
+<span class="nc" id="L90">        String markDeleteUrl = BASE_URL + &quot;articles/&quot; + articleId;</span>
+
+<span class="nc" id="L92">        StringRequest markRequest = new StringRequest(Request.Method.DELETE, markDeleteUrl,</span>
+                response -&gt; {
+<span class="nc" id="L94">                    String finalizeUrl = BASE_URL + &quot;articles/&quot; + articleId + &quot;/finalizeDeletion&quot;;</span>
+<span class="nc" id="L95">                    StringRequest finalizeRequest = new StringRequest(Request.Method.DELETE, finalizeUrl,</span>
+                            finalizeResponse -&gt; {
+<span class="nc" id="L97">                                Toast.makeText(EditArticleActivity.this, &quot;Article deleted successfully&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L98">                                finish(); // Close the activity after deletion</span>
+<span class="nc" id="L99">                            },</span>
+                            finalizeError -&gt; {
+<span class="nc" id="L101">                                Toast.makeText(EditArticleActivity.this, &quot;Finalize deletion failed&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L102">                                finalizeError.printStackTrace();</span>
+<span class="nc" id="L103">                            });</span>
+
+<span class="nc" id="L105">                    VolleySingleton.getInstance(EditArticleActivity.this).addToRequestQueue(finalizeRequest);</span>
+<span class="nc" id="L106">                },</span>
+                error -&gt; {
+<span class="nc" id="L108">                    Toast.makeText(EditArticleActivity.this, &quot;Failed to mark article for deletion&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L109">                    error.printStackTrace();</span>
+<span class="nc" id="L110">                });</span>
+
+<span class="nc" id="L112">        VolleySingleton.getInstance(this).addToRequestQueue(markRequest);</span>
+<span class="nc" id="L113">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span>Generated by the Android Gradle plugin 8.7.3</div></body></html>

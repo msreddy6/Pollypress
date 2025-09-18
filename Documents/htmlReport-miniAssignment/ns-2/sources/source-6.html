@@ -1,0 +1,101 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ArticleRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">onetomany.Articles</a>
+</div>
+
+<h1>Coverage Summary for Class: ArticleRepository (onetomany.Articles)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ArticleRepository</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package onetomany.Articles;
+&nbsp;
+&nbsp;import org.springframework.data.jpa.repository.JpaRepository;
+&nbsp;import org.springframework.stereotype.Repository;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.time.LocalDate;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author Vikrant Gandotra
+&nbsp; */
+&nbsp;
+&nbsp;@Repository
+&nbsp;public interface ArticleRepository extends JpaRepository&lt;Article, Long&gt; {
+&nbsp;    // Find all articles written by a given author
+&nbsp;    List&lt;Article&gt; findByAuthor(String author);
+&nbsp;
+&nbsp;    // Find all articles published by a given publication
+&nbsp;    List&lt;Article&gt; findByPublication(String publication);
+&nbsp;
+&nbsp;    // Find an article by its title
+&nbsp;    Optional&lt;Article&gt; findByTitle(String title);
+&nbsp;
+&nbsp;    // Find articles published between two dates
+&nbsp;    List&lt;Article&gt; findByPublicationDateBetween(LocalDate startDate, LocalDate endDate);
+&nbsp;
+&nbsp;    // Find articles whose title contains a word
+&nbsp;    List&lt;Article&gt; findByTitleContaining(String keyword);
+&nbsp;
+&nbsp;    List&lt;Article&gt; findByReporter_Username(String name);
+&nbsp;
+&nbsp;    List&lt;Article&gt; findByApprovedTrueAndPendingDeletionFalse();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-06 12:37</div>
+</div>
+</body>
+</html>

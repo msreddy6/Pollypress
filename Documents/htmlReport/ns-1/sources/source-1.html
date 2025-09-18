@@ -1,0 +1,180 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Main</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">onetomany</a>
+</div>
+
+<h1>Coverage Summary for Class: Main (onetomany)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Main</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Main$$SpringCGLIB$$0</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package onetomany;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;import org.springframework.boot.CommandLineRunner;
+&nbsp;import org.springframework.boot.SpringApplication;
+&nbsp;import org.springframework.boot.autoconfigure.SpringBootApplication;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;
+&nbsp;import onetomany.admin.Admin;
+&nbsp;import onetomany.admin.AdminRepository;
+&nbsp;import onetomany.reporter.Reporter;
+&nbsp;import onetomany.reporter.ReporterRepository;
+&nbsp;import onetomany.Articles.Article;
+&nbsp;import onetomany.Articles.ArticleRepository;
+&nbsp;import onetomany.newsusers.NewsUser;
+&nbsp;import onetomany.newsusers.NewsUserRepository;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author Vikrant Gandotra
+&nbsp; */
+&nbsp;
+&nbsp;@SpringBootApplication//(scanBasePackages = &quot;onetomany&quot;)
+<b class="fc">&nbsp;public class Main {</b>
+&nbsp;
+&nbsp;    public static void main(String[] args) {
+<b class="nc">&nbsp;        SpringApplication.run(Main.class, args);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;//    @Bean
+&nbsp;//    CommandLineRunner initNewsApp(
+&nbsp;//            AdminRepository adminRepository,
+&nbsp;//            ReporterRepository reporterRepository,
+&nbsp;//            ArticleRepository articleRepository,
+&nbsp;//            NewsUserRepository newsUserRepository
+&nbsp;//    ) {
+&nbsp;//        return args -&gt; {
+&nbsp;//            Admin admin1 = new Admin(&quot;Alice Admin&quot;, &quot;admin1@example.com&quot;);
+&nbsp;//            adminRepository.save(admin1);
+&nbsp;//
+&nbsp;//            Reporter reporter1 = new Reporter(&quot;Bob Reporter&quot;, &quot;bob.reporter@example.com&quot;);
+&nbsp;//            Reporter reporter2 = new Reporter(&quot;Carol Reporter&quot;, &quot;carol.reporter@example.com&quot;);
+&nbsp;//            reporterRepository.save(reporter1);
+&nbsp;//            reporterRepository.save(reporter2);
+&nbsp;//
+&nbsp;////            Article article1 = new Article(&quot;Breaking News&quot;, &quot;Content of breaking news&quot;,
+&nbsp;////                    reporter1, &quot;Global News&quot;, LocalDate.now());
+&nbsp;////            Article article2 = new Article(&quot;Tech Update&quot;, &quot;Content of tech update&quot;,
+&nbsp;////                    reporter2, &quot;Tech Today&quot;, LocalDate.now().minusDays(1));
+&nbsp;//            Article article1 = new Article(&quot;Breaking News&quot;, &quot;Content of breaking news&quot;, reporter1, &quot;Global News&quot;, LocalDate.now());
+&nbsp;//            Article article2 = new Article(&quot;Tech Update&quot;, &quot;Content of tech update&quot;, reporter2, &quot;Tech Today&quot;, LocalDate.now().minusDays(1));
+&nbsp;//
+&nbsp;//            articleRepository.save(article1);
+&nbsp;//            articleRepository.save(article2);
+&nbsp;//
+&nbsp;//            article1.setApproved(true);
+&nbsp;//            article1.setApprovedBy(admin1);
+&nbsp;//            articleRepository.save(article1);
+&nbsp;//
+&nbsp;//            NewsUser newsUser1 = new NewsUser(&quot;Dave Reader&quot;, &quot;dave@example.com&quot;, &quot;1234&quot;);
+&nbsp;//            NewsUser newsUser2 = new NewsUser(&quot;Eva Reader&quot;, &quot;eva@example.com&quot;, &quot;5678&quot;);
+&nbsp;//            newsUserRepository.save(newsUser1);
+&nbsp;//            newsUserRepository.save(newsUser2);
+&nbsp;//        };
+&nbsp;//    }
+&nbsp;}
+&nbsp;//test CI MAIN 2
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-06 12:37</div>
+</div>
+</body>
+</html>

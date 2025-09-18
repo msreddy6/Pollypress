@@ -1,0 +1,5 @@
+OpenAPI Spec (JSON):  
+http://coms-3090-003.class.las.iastate.edu:8081/api-docs
+
+Swagger UI:  
+http://coms-3090-003.class.las.iastate.edu:8080/swagger-ui/index.html

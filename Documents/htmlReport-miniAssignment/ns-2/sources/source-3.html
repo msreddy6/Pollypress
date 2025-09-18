@@ -1,0 +1,289 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Article</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">onetomany.Articles</a>
+</div>
+
+<h1>Coverage Summary for Class: Article (onetomany.Articles)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Article</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.6%
+  </span>
+  <span class="absValue">
+    (19/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    55.6%
+  </span>
+  <span class="absValue">
+    (20/36)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Article$HibernateInstantiator$S0XnmvjI</td>
+  </tr>
+  <tr>
+    <td class="name">Article$HibernateProxy$FS2q9Fpq</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    82.6%
+  </span>
+  <span class="absValue">
+    (19/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    55.6%
+  </span>
+  <span class="absValue">
+    (20/36)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package onetomany.Articles;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.annotation.JsonIgnoreProperties; // added this line
+&nbsp;import jakarta.persistence.Entity;
+&nbsp;import jakarta.persistence.GeneratedValue;
+&nbsp;import jakarta.persistence.GenerationType;
+&nbsp;import jakarta.persistence.Id;
+&nbsp;import jakarta.persistence.Table;
+&nbsp;import java.time.LocalDate;
+&nbsp;import jakarta.persistence.ManyToOne;
+&nbsp;import jakarta.persistence.JoinColumn;
+&nbsp;import onetomany.reporter.Reporter;
+&nbsp;import onetomany.admin.Admin;
+&nbsp;import onetomany.newsusers.NewsUser;
+&nbsp;import jakarta.persistence.ManyToMany;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author Vikrant Gandotra
+&nbsp; */
+&nbsp;
+&nbsp;@Entity
+&nbsp;@Table(name = &quot;articles&quot;)
+&nbsp;public class Article {
+&nbsp;
+&nbsp;
+&nbsp;    @Id
+&nbsp;    @GeneratedValue(strategy = GenerationType.IDENTITY)
+&nbsp;    private Long id;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    private String title;
+&nbsp;
+&nbsp;    private boolean approved;
+&nbsp;
+&nbsp;    private boolean pendingDeletion;
+&nbsp;
+&nbsp;    // The content text body of the article
+&nbsp;    private String content;
+&nbsp;
+&nbsp;    private String author;
+&nbsp;
+&nbsp;    // Name of the publication or news outlet
+&nbsp;    private String publication;
+&nbsp;
+&nbsp;    // Publication date of the article
+&nbsp;    private LocalDate publicationDate;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    @ManyToOne
+&nbsp;    @JoinColumn(name = &quot;reporter_id&quot;)
+&nbsp;    @JsonIgnoreProperties(&quot;articles&quot;) // added this line
+&nbsp;    private Reporter reporter;
+&nbsp;
+&nbsp;    @ManyToOne
+&nbsp;    @JoinColumn(name = &quot;admin_id&quot;)
+&nbsp;    @JsonIgnoreProperties(&quot;approvedArticles&quot;) // added this line
+&nbsp;    private Admin approvedBy;
+&nbsp;
+<b class="fc">&nbsp;    @ManyToMany(mappedBy = &quot;favoriteArticles&quot;)</b>
+&nbsp;    private Set&lt;NewsUser&gt; favoritedByUsers = new HashSet&lt;&gt;();
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;//    public Article(String breakingNews, String contentOfBreakingNews, Reporter reporter1, String globalNews, LocalDate now) {}
+&nbsp;
+<b class="fc">&nbsp;    public Article() {}</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    public Article(String title, String content, Reporter reporter, String publication, LocalDate publicationDate) {</b>
+<b class="nc">&nbsp;        this.title = title;</b>
+<b class="nc">&nbsp;        this.content = content;</b>
+<b class="nc">&nbsp;        this.reporter = reporter;</b>
+<b class="nc">&nbsp;        this.publication = publication;</b>
+<b class="nc">&nbsp;        this.publicationDate = publicationDate;</b>
+<b class="nc">&nbsp;        this.approved = false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    public Article(String title, String content, String author, String publication, LocalDate publicationDate) {</b>
+<b class="nc">&nbsp;        this.title = title;</b>
+<b class="nc">&nbsp;        this.content = content;</b>
+<b class="nc">&nbsp;        this.author = author;</b>
+<b class="nc">&nbsp;        this.publication = publication;</b>
+<b class="nc">&nbsp;        this.publicationDate = publicationDate;</b>
+<b class="nc">&nbsp;        this.approved=false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public Long getId() {
+<b class="fc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setId(Long id) {
+<b class="nc">&nbsp;        this.id = id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTitle() {
+<b class="fc">&nbsp;        return title;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTitle(String title) {
+<b class="fc">&nbsp;        this.title = title;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getContent() {
+<b class="fc">&nbsp;        return content;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setContent(String content) {
+<b class="fc">&nbsp;        this.content = content;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getAuthor() {
+<b class="fc">&nbsp;        return author;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAuthor(String author) {
+<b class="fc">&nbsp;        this.author = author;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getPublication() {
+<b class="fc">&nbsp;        return publication;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPublication(String publication) {
+<b class="fc">&nbsp;        this.publication = publication;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LocalDate getPublicationDate() {
+<b class="fc">&nbsp;        return publicationDate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPublicationDate(LocalDate publicationDate) {
+<b class="fc">&nbsp;        this.publicationDate = publicationDate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Reporter getReporter() {
+<b class="fc">&nbsp;        return reporter;</b>
+&nbsp;    }
+&nbsp;    public void setReporter(Reporter reporter) {
+<b class="fc">&nbsp;        this.reporter = reporter;</b>
+&nbsp;    }
+&nbsp;    public Admin getApprovedBy() {
+<b class="fc">&nbsp;        return approvedBy;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isApproved() {
+<b class="fc">&nbsp;        return approved;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isPendingDeletion() {
+<b class="fc">&nbsp;        return pendingDeletion;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPendingDeletion(boolean pendingDeletion) {
+<b class="fc">&nbsp;        this.pendingDeletion = pendingDeletion;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setApprovedBy(Admin approvedBy) {
+<b class="nc">&nbsp;        this.approvedBy = approvedBy;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setApproved(boolean approved) {
+<b class="fc">&nbsp;        this.approved = approved;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-06 12:37</div>
+</div>
+</body>
+</html>

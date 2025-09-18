@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+        <EditText
+            android:id="@+id/etEditPollTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Poll Title" />
+        <EditText
+            android:id="@+id/etEditPollDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Poll Description"
+            android:inputType="textMultiLine"
+            android:minLines="3" />
+        <EditText
+            android:id="@+id/etEditPollOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter options separated by commas" />
+        <Button
+            android:id="@+id/btnUpdatePoll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Update"
+            android:layout_marginTop="16dp" />
+        <Button
+            android:id="@+id/btnDeletePoll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+</ScrollView>

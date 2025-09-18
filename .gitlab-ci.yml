@@ -1,0 +1,97 @@
+stages:
+  - mavenbuild
+  - maventest
+  - mavendeploy
+  - androidbuild
+  - androidtest
+
+maven-build:
+  stage: mavenbuild
+  tags:
+    - springboot_tag
+  before_script:
+    # point Maven at JDK 17 so the compile works
+    - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+    - export PATH="$JAVA_HOME/bin:$PATH"
+  script:
+    - cd Backend/App/tutorials-springboot_unit2_2_onetomany/springboot_example
+    - mvn -B package
+  artifacts:
+    paths:
+      - Backend/App/tutorials-springboot_unit2_2_onetomany/springboot_example/target/*.jar
+  only:
+    refs:
+      - main
+    changes:
+      - Backend/**/*
+
+maven-test:
+  stage: maventest
+  tags:
+    - springboot_tag
+  before_script:
+    - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+    - export PATH="$JAVA_HOME/bin:$PATH"
+  script:
+    - cd Backend/App/tutorials-springboot_unit2_2_onetomany/springboot_example
+    - mvn -B test
+  only:
+    refs:
+      - main
+    changes:
+      - Backend/**/*
+
+auto-deploy:
+  stage: mavendeploy
+  tags:
+    - springboot_tag
+  script:
+    - cd Backend/App/tutorials-springboot_unit2_2_onetomany/springboot_example
+    - sudo mv target/*.jar /target/web-demo.jar
+    - sudo systemctl stop system-web-demo
+    - sudo systemctl start system-web-demo
+  only:
+    refs:
+      - main
+    changes:
+      - Backend/**/*
+
+android-build:
+  image:
+    name: afirefly/android-ci:java17
+    entrypoint: [""]
+  stage: androidbuild
+  tags:
+    - android_tag
+  before_script:
+    - cd Frontend
+    - chmod +x gradlew
+  script:
+    # skip lint only; no more -x javadoc
+    - ./gradlew clean assembleDebug -x lint
+  artifacts:
+    paths:
+      - Frontend/app/build/outputs/**/*.apk
+  only:
+    refs:
+      - main
+    changes:
+      - Frontend/**/*
+
+android-test:
+  image:
+    name: afirefly/android-ci:java17
+    entrypoint: [""]
+  stage: androidtest
+  tags:
+    - android_tag
+  before_script:
+    - cd Frontend
+    - chmod +x gradlew
+  script:
+    - ./gradlew test
+  only:
+    refs:
+      - main
+    changes:
+      - Frontend/**/*

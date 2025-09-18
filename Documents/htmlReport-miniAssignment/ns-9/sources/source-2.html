@@ -1,0 +1,175 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ReporterController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">onetomany.reporter</a>
+</div>
+
+<h1>Coverage Summary for Class: ReporterController (onetomany.reporter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReporterController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.6%
+  </span>
+  <span class="absValue">
+    (4/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package onetomany.reporter;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author Vikrant Gandotra
+&nbsp; */
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/reporters&quot;)
+<b class="fc">&nbsp;public class ReporterController {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private ReporterRepository reporterRepository;
+&nbsp;
+&nbsp;    // Retrieve all reporters
+&nbsp;    @GetMapping
+&nbsp;    public List&lt;Reporter&gt; getAllReporters() {
+<b class="nc">&nbsp;        return reporterRepository.findAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Retrieve a reporter by id
+&nbsp;    @GetMapping(&quot;/{id}&quot;)
+&nbsp;    public Reporter getReporterById(@PathVariable Long id) {
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        Optional&lt;Reporter&gt; reporterOpt = reporterRepository.findById(id);</b>
+<b class="fc">&nbsp;        return reporterOpt.orElse(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Create a new reporter
+&nbsp;    @PostMapping
+&nbsp;    public Reporter createReporter(@RequestBody Reporter reporter) {
+<b class="fc">&nbsp;        return reporterRepository.save(reporter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Update an existing reporter
+&nbsp;    @PutMapping(&quot;/{id}&quot;)
+&nbsp;    public Reporter updateReporter(@PathVariable Long id, @RequestBody Reporter reporterDetails) {
+<b class="nc">&nbsp;        Optional&lt;Reporter&gt; optionalReporter = reporterRepository.findById(id);</b>
+<b class="nc">&nbsp;        if (!optionalReporter.isPresent()) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Reporter reporter = optionalReporter.get();</b>
+<b class="nc">&nbsp;        reporter.setUsername(reporterDetails.getUsername());</b>
+<b class="nc">&nbsp;        reporter.setEmail(reporterDetails.getEmail());</b>
+<b class="nc">&nbsp;        return reporterRepository.save(reporter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Delete a reporter by id
+&nbsp;    @DeleteMapping(&quot;/{id}&quot;)
+&nbsp;    public String deleteReporter(@PathVariable Long id) {
+<b class="nc">&nbsp;        reporterRepository.deleteById(id);</b>
+<b class="nc">&nbsp;        return &quot;{\&quot;message\&quot;:\&quot;Reporter deleted\&quot;}&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-06 12:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,113 @@
+apply plugin: 'com.android.application'
+apply plugin: 'jacoco'
+
+android {
+    namespace "com.example.pollypress"
+    compileSdkVersion 34
+
+    defaultConfig {
+        applicationId "com.example.pollypress"
+        minSdkVersion 21
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
+    // Force JUnit 4.13.2 everywhere (overrides any strict 4.10 constraint)
+    configurations.all {
+        resolutionStrategy {
+            force 'junit:junit:4.13.2'
+        }
+    }
+}
+
+dependencies {
+    // Exclude stray jars in libs/
+    implementation fileTree(
+            dir: "libs",
+            include: ["*.jar"],
+            exclude: ["junit*.jar", "hamcrest*.jar", "listenablefuture*.jar"]
+    )
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'
+    implementation 'com.android.volley:volley:1.2.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation libs.testng
+
+    // JVM Unit & Robolectric
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.9.1'
+    testImplementation 'androidx.test:core:1.5.0'
+    testImplementation 'androidx.test.ext:junit:1.1.5'
+    testImplementation 'org.mockito:mockito-core:4.+'
+    androidTestImplementation 'org.hamcrest:hamcrest:2.2'
+
+    // Espresso tests
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.1'
+    // We force JUnit via resolutionStrategy, no need to add it again here
+}
+
+// Exclude duplicate Hamcrest and Listenabl​eFuture everywhere
+configurations.all {
+    exclude group: 'com.google.guava', module: 'listenablefuture'
+}
+
+afterEvaluate {
+    if (System.getenv('CI') == null) {
+        android.applicationVariants.all { variant ->
+            if (variant.buildType.name == 'release') {
+                task "javadoc${variant.name.capitalize()}"(type: Javadoc) {
+                    group = 'documentation'
+                    description = "Generate Javadoc for ${variant.name}"
+                    source      = variant.sourceSets.collect { it.java.srcDirs }.flatten()
+                    classpath   = files(android.bootClasspath) + variant.javaCompileProvider.get().classpath
+                    options {
+                        author             = true
+                        version            = true
+                        encoding           = 'UTF-8'
+                        addStringOption('Xdoclint:none', '-quiet')
+                        links('https://developer.android.com/reference/')
+                    }
+                    destinationDir = file("C:/Users/mshiv/1_mahdi_3/Documents/android-javadoc")
+                    failOnError    = false
+                    exclude '**/R.java', '**/BuildConfig.java'
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.example.pollypress"},{"l":"com.example.pollypress.adapter"},{"l":"com.example.pollypress.auth"},{"l":"com.example.pollypress.content"},{"l":"com.example.pollypress.dashboards"},{"l":"com.example.pollypress.model"}];updateSearchResults();

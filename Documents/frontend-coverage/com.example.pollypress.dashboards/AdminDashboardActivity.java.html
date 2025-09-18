@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminDashboardActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.pollypress.dashboards</a> &gt; <span class="el_source">AdminDashboardActivity.java</span></div><h1>AdminDashboardActivity.java</h1><pre class="source lang-java linenums">package com.example.pollypress.dashboards;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.*;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.example.pollypress.*;
+import com.example.pollypress.adapter.AdminPollAdapter;
+import com.example.pollypress.adapter.AdminArticleAdapter;
+import com.example.pollypress.model.ArticleModel;
+import com.example.pollypress.model.PollModel;
+import com.example.pollypress.content.EditArticleActivity;
+import com.example.pollypress.content.EditPollActivity;
+import com.example.pollypress.auth.MainActivity;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.util.ArrayList;
+
+/**
+ * AdminDashboardActivity - Admin's main dashboard for managing articles, polls, profile, and tickets.
+ * Allows the admin to approve, edit, delete articles and polls, access tickets, and manage profile settings.
+ */
+<span class="fc" id="L33">public class AdminDashboardActivity extends AppCompatActivity {</span>
+
+    private static final String BASE_URL = VolleySingleton.BASE_URL;
+
+    private RecyclerView recyclerViewArticles, recyclerViewPolls;
+    private AdminArticleAdapter articleAdapter;
+    private AdminPollAdapter pollAdapter;
+    private ArrayList&lt;ArticleModel&gt; articleList;
+    private ArrayList&lt;PollModel&gt; pollList;
+
+    private DrawerLayout drawerLayout;
+    private LinearLayout navigationDrawer;
+    private ImageView btnMenu, profileImage;
+    private TextView tvUsername;
+    private Button btnShareApp, btnLogout, btnAdminTickets;
+
+    /**
+     * Called when the activity is first created.
+     * Initializes drawer layout, recycler views, and buttons.
+     * Fetches articles and polls from the server.
+     *
+     * @param savedInstanceState Saved instance state bundle
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="fc" id="L58">        super.onCreate(savedInstanceState);</span>
+<span class="fc" id="L59">        setContentView(R.layout.admin_dashboard);</span>
+
+<span class="fc" id="L61">        setupDrawer();</span>
+<span class="fc" id="L62">        setupRecyclerViews();</span>
+<span class="fc" id="L63">        setupButtons();</span>
+
+<span class="fc" id="L65">        fetchArticles();</span>
+<span class="fc" id="L66">        fetchPolls();</span>
+<span class="fc" id="L67">    }</span>
+
+    /**
+     * Sets up the navigation drawer with menu button, profile image click, share and logout actions.
+     */
+    private void setupDrawer() {
+<span class="fc" id="L73">        drawerLayout = findViewById(R.id.drawerLayout);</span>
+<span class="fc" id="L74">        navigationDrawer = findViewById(R.id.navigationDrawer);</span>
+<span class="fc" id="L75">        btnMenu = findViewById(R.id.btnMenu);</span>
+<span class="fc" id="L76">        profileImage = findViewById(R.id.profileImage);</span>
+<span class="fc" id="L77">        tvUsername = findViewById(R.id.tvUsername);</span>
+<span class="fc" id="L78">        btnShareApp = findViewById(R.id.btnShareApp);</span>
+<span class="fc" id="L79">        btnLogout = findViewById(R.id.btnLogout);</span>
+
+<span class="fc" id="L81">        AdminSession session = new AdminSession(this);</span>
+<span class="fc" id="L82">        String username = session.getAdminUsername();</span>
+<span class="fc" id="L83">        tvUsername.setText(&quot;Hi, &quot; + username);</span>
+
+<span class="pc" id="L85">        btnMenu.setOnClickListener(v -&gt; drawerLayout.openDrawer(navigationDrawer));</span>
+
+<span class="fc" id="L87">        btnShareApp.setOnClickListener(v -&gt; {</span>
+<span class="nc" id="L88">            Intent shareIntent = new Intent(Intent.ACTION_SEND);</span>
+<span class="nc" id="L89">            shareIntent.setType(&quot;text/plain&quot;);</span>
+<span class="nc" id="L90">            shareIntent.putExtra(Intent.EXTRA_TEXT, &quot;Check out PollyPress Admin App!&quot;);</span>
+<span class="nc" id="L91">            startActivity(Intent.createChooser(shareIntent, &quot;Share via&quot;));</span>
+<span class="nc" id="L92">        });</span>
+
+<span class="fc" id="L94">        btnLogout.setOnClickListener(v -&gt; {</span>
+<span class="nc" id="L95">            session.logout();</span>
+<span class="nc" id="L96">            startActivity(new Intent(this, MainActivity.class));</span>
+<span class="nc" id="L97">            finish();</span>
+<span class="nc" id="L98">        });</span>
+<span class="fc" id="L99">    }</span>
+
+    /**
+     * Initializes and binds the RecyclerViews for articles and polls.
+     */
+    private void setupRecyclerViews() {
+<span class="fc" id="L105">        recyclerViewArticles = findViewById(R.id.recyclerViewAdminArticles);</span>
+<span class="fc" id="L106">        recyclerViewPolls = findViewById(R.id.recyclerViewAdminPolls);</span>
+
+<span class="fc" id="L108">        recyclerViewArticles.setLayoutManager(new LinearLayoutManager(this));</span>
+<span class="fc" id="L109">        recyclerViewPolls.setLayoutManager(new LinearLayoutManager(this));</span>
+
+<span class="fc" id="L111">        articleList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L112">        pollList = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L114">        articleAdapter = new AdminArticleAdapter(articleList, new AdminArticleAdapter.OnArticleActionListener() {</span>
+<span class="nc" id="L115">            @Override public void onApproveClicked(int articleId) { approveArticle(articleId); }</span>
+<span class="nc" id="L116">            @Override public void onEditClicked(ArticleModel article) { openEditArticleActivity(article); }</span>
+            @Override public void onDeleteClicked(int articleId) {
+<span class="nc" id="L118">                deleteArticle(articleId, AdminDashboardActivity.this::fetchArticles);</span>
+<span class="nc" id="L119">            }</span>
+        });
+
+
+<span class="fc" id="L123">        pollAdapter = new AdminPollAdapter(pollList, new AdminPollAdapter.OnPollActionListener() {</span>
+<span class="nc" id="L124">            @Override public void onApproveClicked(int pollId) { approvePoll(pollId); }</span>
+<span class="nc" id="L125">            @Override public void onEditClicked(PollModel poll) { openEditPollActivity(poll); }</span>
+<span class="nc" id="L126">            @Override public void onDeleteClicked(int pollId) { deletePoll(pollId); }</span>
+        });
+
+<span class="fc" id="L129">        recyclerViewArticles.setAdapter(articleAdapter);</span>
+<span class="fc" id="L130">        recyclerViewPolls.setAdapter(pollAdapter);</span>
+<span class="fc" id="L131">    }</span>
+
+    /**
+     * Sets up other buttons, such as the ticket viewing button.
+     */
+    private void setupButtons() {
+<span class="fc" id="L137">        btnAdminTickets = findViewById(R.id.btnAdminTickets);</span>
+<span class="fc" id="L138">        btnAdminTickets.setOnClickListener(v -&gt;</span>
+<span class="nc" id="L139">                startActivity(new Intent(this, AdminTicketsActivity.class))</span>
+        );
+<span class="fc" id="L141">    }</span>
+
+    /**
+     * Fetches all unapproved articles from the server and updates the RecyclerView.
+     */
+    private void fetchArticles() {
+<span class="fc" id="L147">        String url = BASE_URL + &quot;articles&quot;;</span>
+<span class="fc" id="L148">        JsonArrayRequest req = new JsonArrayRequest(Request.Method.GET, url, null,</span>
+                response -&gt; {
+<span class="fc" id="L150">                    articleList.clear();</span>
+                    try {
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">                        for (int i = 0; i &lt; response.length(); i++) {</span>
+<span class="nc" id="L153">                            JSONObject obj = response.getJSONObject(i);</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">                            if (!obj.optBoolean(&quot;approved&quot;, false)) {</span>
+<span class="nc" id="L155">                                articleList.add(new ArticleModel(</span>
+<span class="nc" id="L156">                                        obj.getInt(&quot;id&quot;),</span>
+<span class="nc" id="L157">                                        obj.optString(&quot;title&quot;, &quot;No Title&quot;),</span>
+<span class="nc" id="L158">                                        obj.optString(&quot;content&quot;, &quot;No Content&quot;),</span>
+<span class="nc" id="L159">                                        obj.optString(&quot;author&quot;, &quot;Unknown&quot;),</span>
+<span class="nc" id="L160">                                        obj.optString(&quot;publication&quot;, &quot;N/A&quot;),</span>
+<span class="nc" id="L161">                                        obj.optString(&quot;publicationDate&quot;, &quot;N/A&quot;),</span>
+                                        &quot;Unapproved&quot;
+                                ));
+                            }
+                        }
+<span class="fc" id="L166">                        articleAdapter.notifyDataSetChanged();</span>
+<span class="nc" id="L167">                    } catch (JSONException e) {</span>
+<span class="nc" id="L168">                        Toast.makeText(this, &quot;Article parsing error&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="fc" id="L169">                    }</span>
+<span class="fc" id="L170">                },</span>
+                error -&gt; {
+<span class="nc" id="L172">                    Toast.makeText(this, &quot;Failed to fetch articles&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L173">                    Log.e(&quot;AdminDashboard&quot;, &quot;fetchArticles error&quot;, error);</span>
+<span class="nc" id="L174">                }</span>
+        );
+<span class="fc" id="L176">        VolleySingleton.getInstance(this).addToRequestQueue(req);</span>
+<span class="fc" id="L177">    }</span>
+
+    /**
+     * Fetches all polls from the server and updates the RecyclerView.
+     */
+    private void fetchPolls() {
+<span class="fc" id="L183">        String url = BASE_URL + &quot;polls&quot;;</span>
+<span class="fc" id="L184">        JsonArrayRequest req = new JsonArrayRequest(Request.Method.GET, url, null,</span>
+                response -&gt; {
+<span class="fc" id="L186">                    pollList.clear();</span>
+                    try {
+<span class="pc bpc" id="L188" title="1 of 2 branches missed.">                        for (int i = 0; i &lt; response.length(); i++) {</span>
+<span class="nc" id="L189">                            JSONObject obj = response.getJSONObject(i);</span>
+<span class="nc" id="L190">                            pollList.add(new PollModel(</span>
+<span class="nc" id="L191">                                    (long) obj.getInt(&quot;id&quot;),</span>
+<span class="nc" id="L192">                                    obj.optString(&quot;title&quot;, &quot;No Title&quot;),</span>
+<span class="nc" id="L193">                                    obj.optString(&quot;description&quot;, &quot;No Description&quot;),</span>
+<span class="nc" id="L194">                                    jsonArrayToList(obj.optJSONArray(&quot;options&quot;)),</span>
+<span class="nc" id="L195">                                    obj.optString(&quot;createdAt&quot;, &quot;&quot;)</span>
+                            ));
+                        }
+<span class="fc" id="L198">                        pollAdapter.notifyDataSetChanged();</span>
+<span class="nc" id="L199">                    } catch (JSONException e) {</span>
+<span class="nc" id="L200">                        Toast.makeText(this, &quot;Poll parsing error&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="fc" id="L201">                    }</span>
+<span class="fc" id="L202">                },</span>
+                error -&gt; {
+<span class="nc" id="L204">                    Toast.makeText(this, &quot;Failed to fetch polls&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L205">                    Log.e(&quot;AdminDashboard&quot;, &quot;fetchPolls error&quot;, error);</span>
+<span class="nc" id="L206">                }</span>
+        );
+<span class="fc" id="L208">        VolleySingleton.getInstance(this).addToRequestQueue(req);</span>
+<span class="fc" id="L209">    }</span>
+
+    /**
+     * Converts a JSONArray to an ArrayList of Strings.
+     *
+     * @param array JSONArray to convert
+     * @return ArrayList&lt;String&gt; containing all elements of the JSONArray
+     * @throws JSONException if parsing fails
+     */
+    private ArrayList&lt;String&gt; jsonArrayToList(JSONArray array) throws JSONException {
+<span class="nc" id="L219">        ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L220" title="All 2 branches missed.">        if (array != null) {</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">            for (int i = 0; i &lt; array.length(); i++) {</span>
+<span class="nc" id="L222">                list.add(array.getString(i));</span>
+            }
+        }
+<span class="nc" id="L225">        return list;</span>
+    }
+
+    /**
+     * Sends a request to approve an article.
+     *
+     * @param articleId ID of the article to approve
+     */
+    private void approveArticle(int articleId) {
+<span class="nc" id="L234">        String url = BASE_URL + &quot;articles/&quot; + articleId + &quot;/approve?adminId=&quot; + new AdminSession(this).getAdminId();</span>
+<span class="nc" id="L235">        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, null,</span>
+                response -&gt; {
+<span class="nc" id="L237">                    Toast.makeText(this, &quot;Article approved&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L238">                    fetchArticles();</span>
+<span class="nc" id="L239">                },</span>
+<span class="nc" id="L240">                error -&gt; Toast.makeText(this, &quot;Article approval failed&quot;, Toast.LENGTH_SHORT).show()</span>
+        );
+<span class="nc" id="L242">        VolleySingleton.getInstance(this).addToRequestQueue(req);</span>
+<span class="nc" id="L243">    }</span>
+
+    /**
+     * Sends a request to permanently delete an article.
+     *
+     * @param articleId ID of the article to delete
+     */
+    private void deleteArticle(int articleId, Runnable refreshCallback) {
+<span class="nc" id="L251">        String markUrl = BASE_URL + &quot;articles/&quot; + articleId;</span>
+<span class="nc" id="L252">        StringRequest markReq = new StringRequest(Request.Method.DELETE, markUrl,</span>
+                response -&gt; {
+<span class="nc" id="L254">                    String finUrl = BASE_URL + &quot;articles/&quot; + articleId + &quot;/finalizeDeletion&quot;;</span>
+<span class="nc" id="L255">                    StringRequest finReq = new StringRequest(Request.Method.DELETE, finUrl,</span>
+                            finResp -&gt; {
+<span class="nc" id="L257">                                Toast.makeText(this, &quot;Article permanently deleted&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L258">                                refreshCallback.run();</span>
+<span class="nc" id="L259">                            },</span>
+<span class="nc" id="L260">                            err -&gt; Toast.makeText(this, &quot;Finalize failed&quot;, Toast.LENGTH_SHORT).show()</span>
+                    );
+<span class="nc" id="L262">                    VolleySingleton.getInstance(this).addToRequestQueue(finReq);</span>
+<span class="nc" id="L263">                },</span>
+<span class="nc" id="L264">                error -&gt; Toast.makeText(this, &quot;Failed to mark article for deletion&quot;, Toast.LENGTH_SHORT).show()</span>
+        );
+<span class="nc" id="L266">        VolleySingleton.getInstance(this).addToRequestQueue(markReq);</span>
+<span class="nc" id="L267">    }</span>
+
+
+    /**
+     * Sends a request to approve a poll.
+     *
+     * @param pollId ID of the poll to approve
+     */
+    private void approvePoll(int pollId) {
+<span class="nc" id="L276">        String url = BASE_URL + &quot;polls/&quot; + pollId + &quot;/approve?adminId=&quot; + new AdminSession(this).getAdminId();</span>
+<span class="nc" id="L277">        JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, url, null,</span>
+                response -&gt; {
+<span class="nc" id="L279">                    Toast.makeText(this, &quot;Poll approved&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L280">                    fetchPolls();</span>
+<span class="nc" id="L281">                },</span>
+<span class="nc" id="L282">                error -&gt; Toast.makeText(this, &quot;Poll approval failed&quot;, Toast.LENGTH_SHORT).show()</span>
+        );
+<span class="nc" id="L284">        VolleySingleton.getInstance(this).addToRequestQueue(req);</span>
+<span class="nc" id="L285">    }</span>
+
+    /**
+     * Sends a request to delete a poll.
+     *
+     * @param pollId ID of the poll to delete
+     */
+    private void deletePoll(int pollId) {
+<span class="nc" id="L293">        String url = BASE_URL + &quot;polls/&quot; + pollId;</span>
+<span class="nc" id="L294">        StringRequest req = new StringRequest(Request.Method.DELETE, url,</span>
+                response -&gt; {
+<span class="nc" id="L296">                    Toast.makeText(this, &quot;Poll deleted&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L297">                    fetchPolls();</span>
+<span class="nc" id="L298">                },</span>
+<span class="nc" id="L299">                error -&gt; Toast.makeText(this, &quot;Poll deletion failed&quot;, Toast.LENGTH_SHORT).show()</span>
+        );
+<span class="nc" id="L301">        VolleySingleton.getInstance(this).addToRequestQueue(req);</span>
+<span class="nc" id="L302">    }</span>
+
+    /**
+     * Opens EditArticleActivity with the selected article's details.
+     *
+     * @param article ArticleModel containing article data
+     */
+    private void openEditArticleActivity(ArticleModel article) {
+<span class="nc" id="L310">        Intent intent = new Intent(this, EditArticleActivity.class);</span>
+<span class="nc" id="L311">        intent.putExtra(&quot;articleId&quot;, article.getId());</span>
+<span class="nc" id="L312">        intent.putExtra(&quot;title&quot;, article.getTitle());</span>
+<span class="nc" id="L313">        intent.putExtra(&quot;content&quot;, article.getContent());</span>
+<span class="nc" id="L314">        intent.putExtra(&quot;author&quot;, article.getAuthor());</span>
+<span class="nc" id="L315">        intent.putExtra(&quot;publication&quot;, article.getPublication());</span>
+<span class="nc" id="L316">        intent.putExtra(&quot;publicationDate&quot;, article.getPublicationDate());</span>
+<span class="nc" id="L317">        startActivity(intent);</span>
+<span class="nc" id="L318">    }</span>
+
+    /**
+     * Opens EditPollActivity with the selected poll's details.
+     *
+     * @param poll PollModel containing poll data
+     */
+    private void openEditPollActivity(PollModel poll) {
+<span class="nc" id="L326">        Intent intent = new Intent(this, EditPollActivity.class);</span>
+<span class="nc" id="L327">        intent.putExtra(&quot;pollId&quot;, poll.getId());</span>
+<span class="nc" id="L328">        intent.putExtra(&quot;title&quot;, poll.getTitle());</span>
+<span class="nc" id="L329">        intent.putExtra(&quot;description&quot;, poll.getDescription());</span>
+<span class="nc" id="L330">        intent.putExtra(&quot;options&quot;, poll.getOptions().toString());</span>
+<span class="nc" id="L331">        startActivity(intent);</span>
+<span class="nc" id="L332">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span>Generated by the Android Gradle plugin 8.7.3</div></body></html>

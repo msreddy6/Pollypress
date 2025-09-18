@@ -1,0 +1,239 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PollController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">onetomany.poll</a>
+</div>
+
+<h1>Coverage Summary for Class: PollController (onetomany.poll)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PollController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (3/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (5/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    44.2%
+  </span>
+  <span class="absValue">
+    (23/52)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package onetomany.poll;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;import onetomany.admin.Admin;
+&nbsp;import onetomany.admin.AdminRepository;
+&nbsp;import onetomany.reporter.Reporter;
+&nbsp;import onetomany.reporter.ReporterRepository;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/polls&quot;)
+<b class="fc">&nbsp;public class PollController {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private PollRepository pollRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private ApprovedPollRepository approvedPollRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private AdminRepository adminRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private ReporterRepository reporterRepository;
+&nbsp;
+&nbsp;    @GetMapping
+&nbsp;    public ResponseEntity&lt;List&lt;Poll&gt;&gt; getAllPolls() {
+<b class="nc">&nbsp;        List&lt;Poll&gt; polls = pollRepository.findAll();</b>
+<b class="nc">&nbsp;        return new ResponseEntity&lt;&gt;(polls, HttpStatus.OK);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;Poll&gt; getPollById(@PathVariable Long id) {
+<b class="nc">&nbsp;        Optional&lt;Poll&gt; pollOpt = pollRepository.findById(id);</b>
+<b class="nc">&nbsp;        return pollOpt.map(poll -&gt; new ResponseEntity&lt;&gt;(poll, HttpStatus.OK))</b>
+<b class="nc">&nbsp;                .orElse(new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping
+&nbsp;    public ResponseEntity&lt;Poll&gt; createPoll(@RequestBody Poll poll) {
+<b class="pc">&nbsp;        if (poll.getReporter() != null &amp;&amp; poll.getReporter().getId() != null) {</b>
+<b class="fc">&nbsp;            Reporter rep = reporterRepository.findById(poll.getReporter().getId()).orElse(null);</b>
+<b class="pc">&nbsp;            if (rep != null) {</b>
+<b class="fc">&nbsp;                poll.setReporter(rep);</b>
+<b class="fc">&nbsp;                poll.setReporterName(rep.getUsername());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        Poll savedPoll = pollRepository.save(poll);</b>
+<b class="fc">&nbsp;        return new ResponseEntity&lt;&gt;(savedPoll, HttpStatus.CREATED);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;Poll&gt; updatePoll(@PathVariable Long id, @RequestBody Poll pollDetails) {
+<b class="nc">&nbsp;        Optional&lt;Poll&gt; pollOpt = pollRepository.findById(id);</b>
+<b class="nc">&nbsp;        if (!pollOpt.isPresent()) {</b>
+<b class="nc">&nbsp;            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Poll poll = pollOpt.get();</b>
+<b class="nc">&nbsp;        poll.setTitle(pollDetails.getTitle());</b>
+<b class="nc">&nbsp;        poll.setDescription(pollDetails.getDescription());</b>
+<b class="nc">&nbsp;        poll.setOptions(pollDetails.getOptions());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (pollDetails.getReporter() != null &amp;&amp; pollDetails.getReporter().getId() != null) {</b>
+<b class="nc">&nbsp;            Reporter rep = reporterRepository.findById(pollDetails.getReporter().getId()).orElse(null);</b>
+<b class="nc">&nbsp;            if (rep != null) {</b>
+<b class="nc">&nbsp;                poll.setReporter(rep);</b>
+<b class="nc">&nbsp;                poll.setReporterName(rep.getUsername());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Poll updatedPoll = pollRepository.save(poll);</b>
+<b class="nc">&nbsp;        return new ResponseEntity&lt;&gt;(updatedPoll, HttpStatus.OK);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/{id}&quot;)
+&nbsp;    public ResponseEntity&lt;String&gt; deletePoll(@PathVariable Long id) {
+<b class="nc">&nbsp;        if (!pollRepository.existsById(id)) {</b>
+<b class="nc">&nbsp;            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        pollRepository.deleteById(id);</b>
+<b class="nc">&nbsp;        return new ResponseEntity&lt;&gt;(&quot;{\&quot;message\&quot;:\&quot;Poll deleted\&quot;}&quot;, HttpStatus.OK);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping(&quot;/{id}/approve&quot;)
+&nbsp;    public ResponseEntity&lt;ApprovedPoll&gt; approvePoll(@PathVariable Long id, @RequestParam Long adminId) {
+<b class="fc">&nbsp;        Optional&lt;Poll&gt; pollOpt = pollRepository.findById(id);</b>
+<b class="pc">&nbsp;        if (!pollOpt.isPresent()) {</b>
+<b class="nc">&nbsp;            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        Poll poll = pollOpt.get();</b>
+<b class="fc">&nbsp;        Admin admin = adminRepository.findById(adminId).orElse(null);</b>
+<b class="pc">&nbsp;        if (admin == null) {</b>
+<b class="nc">&nbsp;            return new ResponseEntity&lt;&gt;(HttpStatus.BAD_REQUEST);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        ApprovedPoll approvedPoll = new ApprovedPoll();</b>
+<b class="fc">&nbsp;        approvedPoll.setTitle(poll.getTitle());</b>
+<b class="fc">&nbsp;        approvedPoll.setDescription(poll.getDescription());</b>
+<b class="fc">&nbsp;        approvedPoll.setOptions(new ArrayList&lt;&gt;(poll.getOptions()));</b>
+<b class="fc">&nbsp;        approvedPoll.setReporter(poll.getReporter());</b>
+<b class="fc">&nbsp;        approvedPoll.setReporterName(poll.getReporterName());</b>
+<b class="fc">&nbsp;        approvedPoll.setApprovedBy(admin);</b>
+<b class="fc">&nbsp;        ApprovedPoll savedApprovedPoll = approvedPollRepository.save(approvedPoll);</b>
+<b class="fc">&nbsp;        pollRepository.delete(poll);</b>
+<b class="fc">&nbsp;        return new ResponseEntity&lt;&gt;(savedApprovedPoll, HttpStatus.OK);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/reporter/{reporterId}&quot;)
+&nbsp;    public ResponseEntity&lt;List&lt;Poll&gt;&gt; getPollsByReporter(@PathVariable Long reporterId) {
+<b class="nc">&nbsp;        List&lt;Poll&gt; polls = pollRepository.findByReporter_Id(reporterId);</b>
+<b class="nc">&nbsp;        return new ResponseEntity&lt;&gt;(polls, HttpStatus.OK);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/reporterName/{reporterName}&quot;)
+&nbsp;    public ResponseEntity&lt;List&lt;Poll&gt;&gt; getPollsByReporterName(@PathVariable String reporterName) {
+<b class="nc">&nbsp;        List&lt;Poll&gt; polls = pollRepository.findByReporterName(reporterName);</b>
+<b class="nc">&nbsp;        return new ResponseEntity&lt;&gt;(polls, HttpStatus.OK);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-06 12:37</div>
+</div>
+</body>
+</html>

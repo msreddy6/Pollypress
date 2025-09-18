@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NewsUserProfileActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.pollypress.dashboards</a> &gt; <span class="el_source">NewsUserProfileActivity.java</span></div><h1>NewsUserProfileActivity.java</h1><pre class="source lang-java linenums">package com.example.pollypress.dashboards;
+
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.widget.*;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import com.android.volley.Request;
+import com.android.volley.toolbox.StringRequest;
+import com.example.pollypress.NewsUserSession;
+import com.example.pollypress.R;
+import com.example.pollypress.VolleySingleton;
+import com.example.pollypress.auth.MainActivity;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ * NewsUserProfileActivity allows a news user to view and manage their profile.
+ * Features include editing username/password, uploading a profile image,
+ * sharing the app, logging out, and deleting the account.
+ * @author Shivadhar Reddy Maddi
+ */
+<span class="fc" id="L27">public class NewsUserProfileActivity extends AppCompatActivity {</span>
+
+    private TextView tvGreeting;
+    private ImageView profileImage;
+    private static final String BASE_URL = &quot;http://coms-3090-003.class.las.iastate.edu:8080/&quot;;
+    private ActivityResultLauncher&lt;Intent&gt; imagePickerLauncher;
+
+    
+    /**
+     * Called when the activity is first created.
+     * Binds views, initializes session, and sets up button listeners
+     * for editing profile, logout, sharing, navigation, and account deletion.
+     *
+     * @param savedInstanceState the activity’s previous state, or null
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="fc" id="L44">        super.onCreate(savedInstanceState);</span>
+<span class="fc" id="L45">        setContentView(R.layout.activity_news_user_profile);</span>
+
+<span class="fc" id="L47">        NewsUserSession session = new NewsUserSession(this);</span>
+<span class="fc" id="L48">        int userId = session.getUserId();</span>
+<span class="fc" id="L49">        String username = session.getUsername();</span>
+<span class="fc" id="L50">        String email = session.getEmail();</span>
+
+<span class="fc" id="L52">        tvGreeting = findViewById(R.id.tvGreeting);</span>
+<span class="fc" id="L53">        profileImage = findViewById(R.id.profileImage);</span>
+<span class="fc" id="L54">        tvGreeting.setText(&quot;Hi, &quot; + username + &quot;\n&quot; + email);</span>
+
+<span class="fc" id="L56">        Button btnEditProfile = findViewById(R.id.btnEditProfile);</span>
+<span class="fc" id="L57">        Button btnLogout = findViewById(R.id.btnLogout);</span>
+<span class="fc" id="L58">        Button btnShareApp = findViewById(R.id.btnShareApp);</span>
+<span class="fc" id="L59">        Button btnBackHome = findViewById(R.id.btnBackHome);</span>
+<span class="fc" id="L60">        Button btnDeleteAccount = findViewById(R.id.btnDeleteAccount);</span>
+
+<span class="pc" id="L62">        btnEditProfile.setOnClickListener(v -&gt; showEditProfileDialog(userId));</span>
+
+<span class="fc" id="L64">        btnLogout.setOnClickListener(v -&gt; {</span>
+<span class="nc" id="L65">            session.clearSession();</span>
+<span class="nc" id="L66">            startActivity(new Intent(this, MainActivity.class));</span>
+<span class="nc" id="L67">            finish();</span>
+<span class="nc" id="L68">        });</span>
+
+<span class="fc" id="L70">        btnShareApp.setOnClickListener(v -&gt; {</span>
+<span class="nc" id="L71">            Intent shareIntent = new Intent(Intent.ACTION_SEND);</span>
+<span class="nc" id="L72">            shareIntent.setType(&quot;text/plain&quot;);</span>
+<span class="nc" id="L73">            shareIntent.putExtra(Intent.EXTRA_TEXT, &quot;Check out PollyPress News App!&quot;);</span>
+<span class="nc" id="L74">            startActivity(Intent.createChooser(shareIntent, &quot;Share via&quot;));</span>
+<span class="nc" id="L75">        });</span>
+
+<span class="fc" id="L77">        btnBackHome.setOnClickListener(v -&gt; {</span>
+<span class="fc" id="L78">            startActivity(new Intent(this, NewsUserDashboardActivity.class));</span>
+<span class="fc" id="L79">            finish();</span>
+<span class="fc" id="L80">        });</span>
+
+<span class="pc" id="L82">        btnDeleteAccount.setOnClickListener(v -&gt; confirmAndDeleteAccount(userId));</span>
+
+        // Image picker setup
+<span class="fc" id="L85">        imagePickerLauncher = registerForActivityResult(</span>
+                new ActivityResultContracts.StartActivityForResult(),
+                result -&gt; {
+<span class="nc bnc" id="L88" title="All 4 branches missed.">                    if (result.getResultCode() == RESULT_OK &amp;&amp; result.getData() != null) {</span>
+<span class="nc" id="L89">                        Uri imageUri = result.getData().getData();</span>
+<span class="nc" id="L90">                        profileImage.setImageURI(imageUri);</span>
+                    }
+<span class="nc" id="L92">                });</span>
+
+<span class="fc" id="L94">        profileImage.setOnClickListener(v -&gt; {</span>
+<span class="nc" id="L95">            Intent pickIntent = new Intent(Intent.ACTION_PICK);</span>
+<span class="nc" id="L96">            pickIntent.setType(&quot;image/*&quot;);</span>
+<span class="nc" id="L97">            imagePickerLauncher.launch(pickIntent);</span>
+<span class="nc" id="L98">        });</span>
+<span class="fc" id="L99">    }</span>
+
+    /**
+     * Displays a dialog allowing the user to enter a new username and password.
+     *
+     * @param userId the ID of the current user
+     */
+    private void showEditProfileDialog(int userId) {
+<span class="nc" id="L107">        AlertDialog.Builder builder = new AlertDialog.Builder(this);</span>
+<span class="nc" id="L108">        LayoutInflater inflater = getLayoutInflater();</span>
+<span class="nc" id="L109">        final android.view.View dialogView = inflater.inflate(R.layout.dialog_edit_profile, null);</span>
+<span class="nc" id="L110">        builder.setView(dialogView);</span>
+
+<span class="nc" id="L112">        EditText etDialogUsername = dialogView.findViewById(R.id.etDialogUsername);</span>
+<span class="nc" id="L113">        EditText etDialogPassword = dialogView.findViewById(R.id.etDialogPassword);</span>
+<span class="nc" id="L114">        Button btnSaveChanges = dialogView.findViewById(R.id.btnSaveChanges);</span>
+
+<span class="nc" id="L116">        AlertDialog dialog = builder.create();</span>
+<span class="nc" id="L117">        btnSaveChanges.setOnClickListener(v -&gt; {</span>
+<span class="nc" id="L118">            String newUsername = etDialogUsername.getText().toString().trim();</span>
+<span class="nc" id="L119">            String newPassword = etDialogPassword.getText().toString().trim();</span>
+<span class="nc" id="L120">            updateUser(userId, newUsername, newPassword);</span>
+<span class="nc" id="L121">            dialog.dismiss();</span>
+<span class="nc" id="L122">        });</span>
+
+<span class="nc" id="L124">        dialog.show();</span>
+<span class="nc" id="L125">    }</span>
+
+    /**
+     * Sends a PUT request to update the user’s profile details on the server.
+     *
+     * @param userId   the ID of the user to update
+     * @param username the new username (or empty to keep current)
+     * @param password the new password (or empty to keep current)
+     */
+    private void updateUser(int userId, String username, String password) {
+<span class="nc" id="L135">        String url = BASE_URL + &quot;newsusers/&quot; + userId;</span>
+<span class="nc" id="L136">        JSONObject body = new JSONObject();</span>
+
+<span class="nc" id="L138">        NewsUserSession session = new NewsUserSession(this);</span>
+<span class="nc" id="L139">        String currentUsername = session.getUsername();</span>
+<span class="nc" id="L140">        String currentEmail = session.getEmail();</span>
+<span class="nc" id="L141">        String currentPassword = session.getPassword();</span>
+
+        try {
+<span class="nc bnc" id="L144" title="All 2 branches missed.">            body.put(&quot;username&quot;, !username.isEmpty() ? username : currentUsername);</span>
+<span class="nc" id="L145">            body.put(&quot;email&quot;, currentEmail);</span>
+<span class="nc bnc" id="L146" title="All 2 branches missed.">            body.put(&quot;password&quot;, !password.isEmpty() ? password : currentPassword);</span>
+<span class="nc" id="L147">        } catch (JSONException e) {</span>
+<span class="nc" id="L148">            e.printStackTrace();</span>
+<span class="nc" id="L149">        }</span>
+
+<span class="nc" id="L151">        StringRequest request = new StringRequest(Request.Method.PUT, url,</span>
+                response -&gt; {
+<span class="nc" id="L153">                    session.saveUserDetails(</span>
+                            userId,
+<span class="nc bnc" id="L155" title="All 2 branches missed.">                            !username.isEmpty() ? username : currentUsername,</span>
+                            currentEmail,
+<span class="nc bnc" id="L157" title="All 2 branches missed.">                            !password.isEmpty() ? password : currentPassword</span>
+                    );
+<span class="nc" id="L159">                    tvGreeting.setText(&quot;Hi, &quot; + session.getUsername() + &quot;\n&quot; + currentEmail);</span>
+<span class="nc" id="L160">                    Toast.makeText(this, &quot;Profile updated&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L161">                },</span>
+                error -&gt; {
+<span class="nc" id="L163">                    error.printStackTrace();</span>
+<span class="nc" id="L164">                    Toast.makeText(this, &quot;Update failed&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L165">                }</span>
+<span class="nc" id="L166">        ) {</span>
+            @Override
+            public byte[] getBody() {
+<span class="nc" id="L169">                return body.toString().getBytes();</span>
+            }
+            @Override
+            public String getBodyContentType() {
+<span class="nc" id="L173">                return &quot;application/json; charset=utf-8&quot;;</span>
+            }
+        };
+
+<span class="nc" id="L177">        VolleySingleton.getInstance(this).addToRequestQueue(request);</span>
+<span class="nc" id="L178">    }</span>
+
+    /**
+     * Prompts the user to confirm account deletion.
+     *
+     * @param userId the ID of the user to delete
+     */
+    private void confirmAndDeleteAccount(int userId) {
+<span class="nc" id="L186">        new AlertDialog.Builder(this)</span>
+<span class="nc" id="L187">                .setTitle(&quot;Delete Account&quot;)</span>
+<span class="nc" id="L188">                .setMessage(&quot;Are you sure you want to delete your account? This cannot be undone.&quot;)</span>
+<span class="nc" id="L189">                .setPositiveButton(&quot;Yes&quot;, (dialog, which) -&gt; deleteAccount(userId))</span>
+<span class="nc" id="L190">                .setNegativeButton(&quot;Cancel&quot;, null)</span>
+<span class="nc" id="L191">                .show();</span>
+<span class="nc" id="L192">    }</span>
+
+    /**
+     * Sends a DELETE request to remove the user’s account from the server.
+     *
+     * @param userId the ID of the user to delete
+     */
+    private void deleteAccount(int userId) {
+<span class="nc" id="L200">        String url = BASE_URL + &quot;newsusers/&quot; + userId;</span>
+<span class="nc" id="L201">        StringRequest request = new StringRequest(Request.Method.DELETE, url,</span>
+                response -&gt; {
+<span class="nc" id="L203">                    Toast.makeText(this, &quot;Account deleted&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L204">                    new NewsUserSession(this).clearSession();</span>
+<span class="nc" id="L205">                    startActivity(new Intent(this, MainActivity.class));</span>
+<span class="nc" id="L206">                    finish();</span>
+<span class="nc" id="L207">                },</span>
+                error -&gt; {
+<span class="nc" id="L209">                    Toast.makeText(this, &quot;Delete failed&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L210">                    error.printStackTrace();</span>
+<span class="nc" id="L211">                }</span>
+        );
+<span class="nc" id="L213">        VolleySingleton.getInstance(this).addToRequestQueue(request);</span>
+<span class="nc" id="L214">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span>Generated by the Android Gradle plugin 8.7.3</div></body></html>

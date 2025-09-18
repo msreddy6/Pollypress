@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreatePollActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.pollypress.content</a> &gt; <span class="el_source">CreatePollActivity.java</span></div><h1>CreatePollActivity.java</h1><pre class="source lang-java linenums">package com.example.pollypress.content;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.pollypress.R;
+import com.example.pollypress.ReporterSession;
+import com.example.pollypress.VolleySingleton;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+<span class="fc" id="L22">public class CreatePollActivity extends AppCompatActivity {</span>
+    private static final String BASE_URL = &quot;http://coms-3090-003.class.las.iastate.edu:8080/&quot;;
+<span class="fc" id="L24">    public static boolean isInTestMode = false;</span>
+
+    private EditText etTitle, etDescription, etOptions;
+    private Button btnSubmit;
+    private TextView tvSuccess;
+    private String reporterName;
+    private int reporterId;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="fc" id="L34">        super.onCreate(savedInstanceState);</span>
+<span class="fc" id="L35">        setContentView(R.layout.create_poll);</span>
+
+<span class="fc" id="L37">        etTitle       = findViewById(R.id.etPollTitle);</span>
+<span class="fc" id="L38">        etDescription = findViewById(R.id.etPollDescription);</span>
+<span class="fc" id="L39">        etOptions     = findViewById(R.id.etPollOptions);</span>
+<span class="fc" id="L40">        btnSubmit     = findViewById(R.id.btnSubmitPoll);</span>
+<span class="fc" id="L41">        tvSuccess     = findViewById(R.id.tvSuccess);</span>
+
+<span class="fc" id="L43">        tvSuccess.setVisibility(View.GONE);</span>
+
+<span class="fc" id="L45">        ReporterSession session = new ReporterSession(this);</span>
+<span class="fc" id="L46">        reporterName = session.getReporterUsername();</span>
+<span class="fc" id="L47">        reporterId   = session.getReporterId();</span>
+
+<span class="fc" id="L49">        btnSubmit.setOnClickListener(v -&gt; submitPoll());</span>
+<span class="fc" id="L50">    }</span>
+
+    private void submitPoll() {
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        if (isInTestMode) {</span>
+<span class="fc" id="L54">            tvSuccess.setText(&quot;Poll created successfully&quot;);</span>
+<span class="fc" id="L55">            tvSuccess.setVisibility(View.VISIBLE);</span>
+<span class="fc" id="L56">            return;</span>
+        }
+
+<span class="nc" id="L59">        String title       = etTitle.getText().toString().trim();</span>
+<span class="nc" id="L60">        String description = etDescription.getText().toString().trim();</span>
+<span class="nc" id="L61">        String optionsText = etOptions.getText().toString().trim();</span>
+
+<span class="nc bnc" id="L63" title="All 6 branches missed.">        if (title.isEmpty() || description.isEmpty() || optionsText.isEmpty()) {</span>
+<span class="nc" id="L64">            Toast.makeText(this, &quot;Please fill all fields&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L65">            return;</span>
+        }
+
+<span class="nc" id="L68">        List&lt;String&gt; options = new ArrayList&lt;&gt;(Arrays.asList(optionsText.split(&quot;,&quot;)));</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        for (int i = 0; i &lt; options.size(); i++) {</span>
+<span class="nc" id="L70">            options.set(i, options.get(i).trim());</span>
+        }
+
+<span class="nc" id="L73">        String url = BASE_URL + &quot;polls&quot;;</span>
+<span class="nc" id="L74">        JSONObject jsonBody = new JSONObject();</span>
+        try {
+<span class="nc" id="L76">            jsonBody.put(&quot;title&quot;, title);</span>
+<span class="nc" id="L77">            jsonBody.put(&quot;description&quot;, description);</span>
+<span class="nc" id="L78">            jsonBody.put(&quot;options&quot;, new JSONArray(options));</span>
+<span class="nc" id="L79">            JSONObject reporterObj = new JSONObject();</span>
+<span class="nc" id="L80">            reporterObj.put(&quot;id&quot;, reporterId);</span>
+<span class="nc" id="L81">            reporterObj.put(&quot;username&quot;, reporterName);</span>
+<span class="nc" id="L82">            jsonBody.put(&quot;reporter&quot;, reporterObj);</span>
+<span class="nc" id="L83">        } catch (JSONException e) {</span>
+<span class="nc" id="L84">            e.printStackTrace();</span>
+<span class="nc" id="L85">        }</span>
+
+<span class="nc" id="L87">        JsonObjectRequest req = new JsonObjectRequest(</span>
+                Request.Method.POST, url, jsonBody,
+                resp -&gt; {
+<span class="nc" id="L90">                    Toast.makeText(this, &quot;Poll created successfully&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">                    if (!isInTestMode) finish();</span>
+<span class="nc" id="L92">                },</span>
+<span class="nc" id="L93">                err -&gt; Toast.makeText(this, &quot;Failed to create poll&quot;, Toast.LENGTH_LONG).show()</span>
+        );
+<span class="nc" id="L95">        VolleySingleton.getInstance(this).addToRequestQueue(req);</span>
+<span class="nc" id="L96">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span>Generated by the Android Gradle plugin 8.7.3</div></body></html>
