@@ -8,7 +8,7 @@
 ![DB](https://img.shields.io/badge/Database-MySQL-00618A)
 ![CI/CD](https://img.shields.io/badge/CI%2FCD-GitLab-orange)
 ![Design](https://img.shields.io/badge/Design-Figma-F24E1E)
-![License](https://img.shields.io/badge/License-MIT-black)
+
 
 ## Overview
 **Polly Press** is a fast, lightweight publishing system: reporters file stories, admins approve, readers get **instant updates** via WebSocket. Built for **speed**, **clarity**, and **scale**.
